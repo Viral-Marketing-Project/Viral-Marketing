@@ -1,0 +1,23 @@
+[project]
+name = "django-mini-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2.7",
+    "django-environ>=0.12.0",
+    "djangorestframework>=3.16.1",
+    "drf-spectacular>=0.28.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-django>=4.11.1",
+    "ruff>=0.14.1",
+]
+prod = [
+    "gunicorn>=23.0.0",
+    "psycopg2-binary>=2.9.11",
+]

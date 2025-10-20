@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra)
         if password:
-            user.set_password(password)
+            user.set_password(password)  # ✅ 해시 저장
         else:
             user.set_unusable_password()
         user.save(using=self._db)
@@ -25,21 +25,16 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """
-    users 테이블 (요구필드 반영)
-    - 이메일(로그인), 비밀번호, 닉네임, 이름, 전화번호
-    - 마지막 로그인, 스태프 여부, 관리자 여부, 계정 활성화 여부
-    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True, max_length=254)   # 로그인 ID
+    email = models.EmailField(unique=True, max_length=254)
     password = models.CharField(max_length=128)
     nickname = models.CharField(max_length=50, blank=True, null=True)
     name = models.CharField(max_length=50, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
 
-    is_staff = models.BooleanField(default=False)       # 스태프 여부
-    is_superuser = models.BooleanField(default=False)   # 관리자 여부
-    is_active = models.BooleanField(default=True)       # 계정 활성화 여부
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(blank=True, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
 
@@ -50,6 +45,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = "users"
-
-    def __str__(self):
-        return self.email

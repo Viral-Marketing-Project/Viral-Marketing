@@ -5,8 +5,11 @@ import os
 
 DEBUG = False
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # 운영 도메인/아이피 (쉼표 구분)
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "example.com").split(",")
+
 
 # 운영 DB(PostgreSQL): 환경변수 존재 시 적용
 if os.getenv("POSTGRES_DB"):

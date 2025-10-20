@@ -16,6 +16,7 @@ dependencies = [
 
 [dependency-groups]
 prod = [
+  "djangorestframework-simplejwt>=5.5.1",
   "gunicorn>=21",
   "psycopg2-binary>=2.9",
 ]

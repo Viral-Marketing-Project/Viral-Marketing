@@ -1,42 +1,44 @@
 # apps/banking/models.py
 import uuid
 from decimal import Decimal
-from django.db import models, transaction
-from django.utils import timezone
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models, transaction
+from django.utils import timezone
+
 
 # ---- CHOICES ----
 BANK_CODES = [
     ("KAKAO", "카카오뱅크"),
-    ("KB",    "KB국민"),
-    ("NH",    "농협"),
-    ("IBK",   "기업"),
-    ("SC",    "SC제일"),
-    ("HANA",  "하나"),
+    ("KB", "KB국민"),
+    ("NH", "농협"),
+    ("IBK", "기업"),
+    ("SC", "SC제일"),
+    ("HANA", "하나"),
     ("WOORI", "우리"),
-    ("SHINHAN","신한"),
-    ("ETC",   "기타"),
+    ("SHINHAN", "신한"),
+    ("ETC", "기타"),
 ]
 
 ACCOUNT_TYPES = [
-    ("DEMAND",    "입출금통장"),    # 단순 입출금
+    ("DEMAND", "입출금통장"),     # 단순 입출금
     ("OVERDRAFT", "마이너스 통장"),
-    ("SAVINGS",   "예·적금"),
-    ("ETC",       "기타"),
+    ("SAVINGS", "예·적금"),
+    ("ETC", "기타"),
 ]
 
 TRANSACTION_IO = [
-    ("DEPOSIT",  "입금"),
+    ("DEPOSIT", "입금"),
     ("WITHDRAW", "출금"),
 ]
 
 TRANSACTION_METHOD = [
-    ("CASH",      "현금"),
-    ("TRANSFER",  "계좌 이체"),
-    ("AUTO",      "자동 이체"),
-    ("CARD",      "카드 결제"),
-    ("ETC",       "기타"),
+    ("CASH", "현금"),
+    ("TRANSFER", "계좌 이체"),
+    ("AUTO", "자동 이체"),
+    ("CARD", "카드 결제"),
+    ("ETC", "기타"),
 ]
 
 
@@ -44,7 +46,7 @@ class Account(models.Model):
     """
     accounts 테이블
     - 유저(FK), 계좌번호, 은행코드, 계좌종류, 잔액, 생성/수정시각
-    - (user, bank_code, account_number) 조합 유니크  👉 한 유저가 같은 계좌를 중복 등록 못 함
+    - (user, bank_code, account_number) 조합 유니크 → 한 유저가 같은 계좌를 중복 등록 불가
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="accounts")
@@ -74,22 +76,35 @@ class Account(models.Model):
 
     # --- 불변 필드 보호: 생성 이후 bank_code/account_number/account_type 변경 불가 ---
     def clean(self):
-        if self.pk:
-            old = Account.objects.get(pk=self.pk)
-            immutable_changed = (
-                old.bank_code != self.bank_code
-                or old.account_number != self.account_number
-                or old.account_type != self.account_type
-            )
-            if immutable_changed:
-                raise ValidationError("계좌의 은행/계좌번호/계좌종류는 생성 이후 수정할 수 없습니다.")
+        # ✅ 신규 생성(adding=True)이면 불변 필드 비교를 건너뜀 (테스트 실패 원인 해결)
+        if self._state.adding or not self.pk:
+            return
+
+        # 기존 레코드와 비교하여 불변 필드가 변경되면 막기
+        old = Account.objects.get(pk=self.pk)
+        immutable_changed = (
+            old.bank_code != self.bank_code
+            or old.account_number != self.account_number
+            or old.account_type != self.account_type
+        )
+        if immutable_changed:
+            raise ValidationError("계좌의 은행/계좌번호/계좌종류는 생성 이후 수정할 수 없습니다.")
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # clean() + 필드 검증
+        # 필드/비즈니스 검증 수행 (clean() 포함)
+        self.full_clean()
         return super().save(*args, **kwargs)
 
     @transaction.atomic
-    def apply_transaction(self, *, amount: Decimal, io_type: str, method: str, description: str = "", when=None):
+    def apply_transaction(
+        self,
+        *,
+        amount: Decimal,
+        io_type: str,
+        method: str,
+        description: str = "",
+        when=None,
+    ):
         """
         동시성 안전 입출금 처리:
         - 자기 계좌 행을 select_for_update로 잠금
@@ -103,6 +118,7 @@ class Account(models.Model):
         if method not in dict(TRANSACTION_METHOD):
             raise ValidationError("허용되지 않는 거래 타입입니다.")
 
+        # 🔒 동시성 잠금 후 최신 잔액 기준으로 처리
         acc = Account.objects.select_for_update().get(pk=self.pk)
 
         if io_type == "WITHDRAW" and acc.balance < amount:

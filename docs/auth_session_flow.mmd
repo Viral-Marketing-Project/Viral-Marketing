@@ -1,0 +1,24 @@
+%% Auth Flow — Login / Refresh / Logout (JWT in HttpOnly Cookies)
+flowchart TD
+    A[로그인 요청\nPOST /api/auth/login/\nemail+password] --> B{자격 증명 유효?\nuser.is_active?}
+    B -- 아니오 --> Bx[401/403 오류]
+    B -- 예 --> C[Refresh/Access 발급\nHttpOnly 쿠키에 저장]
+    C --> D[200 OK + user 정보]
+    D --> E[인증 필요한 API 호출\nAuthorization: 쿠키 기반]
+    E --> F{Access 만료?}
+    F -- 아니오 --> E
+    F -- 예 --> G[토큰 갱신 요청\nPOST /api/auth/refresh/\n쿠키 또는 body.refresh]
+    G --> H{refresh 유효? 블랙리스트?}
+    H -- 아니오 --> Hx[401 오류\n재로그인 필요]
+    H -- 예 --> I[새 Access/Refresh 재발급\n쿠키 갱신]
+    I --> E
+
+    subgraph "로그아웃"
+      L[POST /api/auth/logout/] --> M[쿠키의 refresh 추출]
+      M --> N{블랙리스트 기능 활성화?}
+      N -- 예 --> O[OutstandingToken 조회 → BlacklistedToken 등록]
+      N -- 아니오 --> P[스킵]
+      O --> Q[쿠키 삭제]
+      P --> Q[쿠키 삭제]
+      Q --> R[200 OK '로그아웃 완료']
+    end

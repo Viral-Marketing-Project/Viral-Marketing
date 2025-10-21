@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1400" height="720" viewBox="0 0 1400 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style><![CDATA[
+      .title { font: 700 22px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #111; }
+      .h { font: 600 18px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #111; }
+      .k { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; fill: #111; }
+      .sub { font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #444; }
+      .box { fill: #fff; stroke: #222; stroke-width: 1.5; rx: 10; }
+      .chip { fill: #eef2ff; stroke: #6366f1; stroke-width: 1; rx: 6; }
+      .relation { stroke: #0ea5e9; stroke-width: 2; marker-end: url(#arrow); }
+      .note { fill: #f8fafc; stroke: #cbd5e1; rx: 8; }
+    ]]></style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="#0ea5e9" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="30" y="40" class="title">django_mini_project — ERD</text>
+  <text x="30" y="68" class="sub">User 1:N Account, Account 1:N TransactionHistory · Immutable account core fields after creation</text>
+
+  <!-- USERS box -->
+  <rect x="40" y="120" width="360" height="420" class="box"/>
+  <text x="60" y="150" class="h">USERS</text>
+  <rect x="60" y="165" width="80" height="22" class="chip"/><text x="70" y="180" class="k">PK: id (UUID)</text>
+  <text x="60" y="210" class="k">email (varchar, unique)</text>
+  <text x="60" y="236" class="k">password (varchar)</text>
+  <text x="60" y="262" class="k">nickname (varchar)</text>
+  <text x="60" y="288" class="k">name (varchar)</text>
+  <text x="60" y="314" class="k">phone (varchar)</text>
+  <text x="60" y="340" class="k">last_login (timestamptz)</text>
+  <text x="60" y="366" class="k">is_staff (bool)</text>
+  <text x="60" y="392" class="k">is_superuser (bool)</text>
+  <text x="60" y="418" class="k">is_active (bool)</text>
+  <text x="60" y="444" class="k">date_joined (timestamptz)</text>
+
+  <!-- ACCOUNTS box -->
+  <rect x="520" y="120" width="360" height="420" class="box"/>
+  <text x="540" y="150" class="h">ACCOUNTS</text>
+  <rect x="540" y="165" width="120" height="22" class="chip"/><text x="550" y="180" class="k">PK: id (UUID)</text>
+  <rect x="540" y="205" width="160" height="22" class="chip"/><text x="550" y="220" class="k">FK: user_id → USERS</text>
+  <text x="540" y="252" class="k">bank_code (enum)</text>
+  <text x="540" y="278" class="k">account_number (varchar)</text>
+  <text x="540" y="304" class="k">account_type (enum)</text>
+  <text x="540" y="330" class="k">balance (numeric(18,2))</text>
+  <text x="540" y="356" class="k">created_at (timestamptz)</text>
+  <text x="540" y="382" class="k">updated_at (timestamptz)</text>
+  <text x="540" y="420" class="k">UNIQUE (user_id, bank_code, account_number)</text>
+  <text x="540" y="446" class="k">INDEX (user_id, created_at desc)</text>
+
+  <!-- TRANSACTION_HISTORY box -->
+  <rect x="1000" y="120" width="360" height="420" class="box"/>
+  <text x="1020" y="150" class="h">TRANSACTION_HISTORY</text>
+  <rect x="1020" y="165" width="120" height="22" class="chip"/><text x="1030" y="180" class="k">PK: id (UUID)</text>
+  <rect x="1020" y="205" width="220" height="22" class="chip"/><text x="1030" y="220" class="k">FK: account_id → ACCOUNTS</text>
+  <text x="1020" y="252" class="k">amount (numeric(18,2))</text>
+  <text x="1020" y="278" class="k">balance_after (numeric(18,2))</text>
+  <text x="1020" y="304" class="k">description (varchar)</text>
+  <text x="1020" y="330" class="k">io_type (enum: DEPOSIT/WITHDRAW)</text>
+  <text x="1020" y="356" class="k">method (enum: CASH/TRANSFER/AUTO/CARD/ETC)</text>
+  <text x="1020" y="382" class="k">created_at (timestamptz)</text>
+  <text x="1020" y="420" class="k">INDEX (account_id, created_at desc)</text>
+  <text x="1020" y="446" class="k">INDEX (account_id, io_type)</text>
+
+  <!-- Relations -->
+  <line x1="400" y1="240" x2="520" y2="240" class="relation"/>
+  <text x="430" y="228" class="sub">1:N</text>
+
+  <line x1="880" y1="240" x2="1000" y2="240" class="relation"/>
+  <text x="910" y="228" class="sub">1:N</text>
+
+  <!-- Notes -->
+  <rect x="40" y="560" width="1320" height="110" class="note"/>
+  <text x="60" y="590" class="k">• Accounts: bank_code/account_number/account_type는 생성 이후 수정 금지 (모델 clean()에서 검증)</text>
+  <text x="60" y="615" class="k">• TransactionHistory 생성은 Account.apply_transaction() 사용 — 행 잠금(select_for_update) + 원자적 잔액 갱신</text>
+  <text x="60" y="640" class="k">• 권한: 모든 API는 본인 리소스만 접근 가능 (IsOwnerOnly 등)</text>
+</svg>

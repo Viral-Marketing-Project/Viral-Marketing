@@ -76,7 +76,6 @@ class Account(models.Model):
 
     # --- 불변 필드 보호: 생성 이후 bank_code/account_number/account_type 변경 불가 ---
     def clean(self):
-        # ✅ 신규 생성(adding=True)이면 불변 필드 비교를 건너뜀 (테스트 실패 원인 해결)
         if self._state.adding or not self.pk:
             return
 

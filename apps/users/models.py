@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra)
         if password:
-            user.set_password(password)  # ✅ 해시 저장
+            user.set_password(password)
         else:
             user.set_unusable_password()
         user.save(using=self._db)

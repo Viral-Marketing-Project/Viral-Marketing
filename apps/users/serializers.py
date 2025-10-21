@@ -18,8 +18,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         raw = validated_data.pop("password")
         user = User(**validated_data)
-        user.is_active = False                   # 이메일 인증 전까지 비활성
-        user.set_password(raw)                  # ✅ 해시 저장
+        user.is_active = False
+        user.set_password(raw)
         user.save()
         return user
 

@@ -12,10 +12,10 @@ if env_file.exists():
     env.read_env(env_file)
 
 # 정적/미디어 (DEV)
-STATIC_URL = "/static/"                       # ✅ 필수
-STATICFILES_DIRS = [BASE_DIR / "static"]      # (선택)
-MEDIA_URL = "/media/"                         # (선택)
-MEDIA_ROOT = BASE_DIR / "media"               # (선택)
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-change-me")
 
@@ -46,23 +46,23 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",     # ✅ admin에 필수
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",  # ✅ admin에 필수
-    "django.contrib.messages.middleware.MessageMiddleware",     # ✅ admin에 필수
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",  # ✅ 필수
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],  # 없으면 빈 리스트여도 OK
         "APP_DIRS": True,                  # 앱 내 templates/ 사용
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request",   # admin에 자주 필요
+                "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],

@@ -21,8 +21,8 @@ class IsOwnerOnly(permissions.BasePermission):
 class TransactionViewSet(mixins.CreateModelMixin,
                          mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
-                         mixins.UpdateModelMixin,      # ✅ 수정
-                         mixins.DestroyModelMixin,     # ✅ 삭제
+                         mixins.UpdateModelMixin,
+                         mixins.DestroyModelMixin,
                          viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOnly]
     queryset = TransactionHistory.objects.select_related("account").all()

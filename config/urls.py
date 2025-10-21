@@ -11,8 +11,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # ---- API 라우팅 ----
-    path("api/auth/", include("apps.users.urls", namespace="users")),     # ✅ 유저/인증
-    path("api/", include("apps.banking.urls", namespace="banking")),      # ✅ 계좌/거래
+    path("api/auth/", include("apps.users.urls", namespace="users")),     # 유저/인증
+    path("api/", include("apps.banking.urls", namespace="banking")),      # 계좌/거래
 
     # ---- API 스키마 & 문서 ----
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

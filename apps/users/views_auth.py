@@ -189,7 +189,6 @@ class RefreshView(APIView):
                 and "rest_framework_simplejwt.token_blacklist" in settings.INSTALLED_APPS
             ):
                 try:
-                    # ✅ jti 기준으로 OutstandingToken 조회 후 블랙리스트 등록
                     jti = old_refresh["jti"]
                     ot = OutstandingToken.objects.get(jti=jti)
                     BlacklistedToken.objects.get_or_create(token=ot)
@@ -233,9 +232,9 @@ class LogoutView(APIView):
         if "rest_framework_simplejwt.token_blacklist" in settings.INSTALLED_APPS and raw_refresh:
             try:
                 refresh = RefreshToken(raw_refresh)
-                jti = refresh["jti"]                      # ✅ jti 추출
-                ot = OutstandingToken.objects.get(jti=jti)  # ✅ OutstandingToken 찾기
-                BlacklistedToken.objects.get_or_create(token=ot)  # ✅ 블랙리스트 등록
+                jti = refresh["jti"]
+                ot = OutstandingToken.objects.get(jti=jti)
+                BlacklistedToken.objects.get_or_create(token=ot)
             except (OutstandingToken.DoesNotExist, TokenError, InvalidToken):
                 # 이미 만료/회수/형식 오류 → 무시하고 진행
                 pass

@@ -9,14 +9,14 @@ class UserAdmin(BaseUserAdmin):
     # 목록 화면
     ordering = ("-date_joined",)
     list_display = ("email", "name", "nickname", "phone", "is_active", "is_staff", "last_login", "date_joined")
-    list_filter = ("is_active", "is_staff")  # ✅ 요구사항: is_staff / is_active 기준 필터
+    list_filter = ("is_active", "is_staff")
 
     # 검색: 이메일/닉네임/휴대폰
-    search_fields = ("email", "nickname", "phone")  # ✅ 요구사항 충족
+    search_fields = ("email", "nickname", "phone")
     # (원하면 name도 추가 가능: "name",)
 
     # 상세 화면: 읽기 전용 필드
-    readonly_fields = ("is_superuser", "last_login", "date_joined")  # ✅ 어드민 여부는 읽기 전용
+    readonly_fields = ("is_superuser", "last_login", "date_joined")
 
     fieldsets = (
         ("기본 정보", {"fields": ("email", "password")}),

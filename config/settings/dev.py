@@ -80,7 +80,6 @@ AUTH_USER_MODEL = "users.User"
 # (4) DRF / drf-spectacular
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    # ✅ JWT를 기본 인증으로 (쿠키 우선 인증 클래스)
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "apps.users.auth.CookieJWTAuthentication",
     ],
@@ -112,9 +111,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@example.com")
 # EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
 # EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 
-# ---------------------------------------------
-# ✅ SimpleJWT & 쿠키 기반 설정
-# ---------------------------------------------
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
